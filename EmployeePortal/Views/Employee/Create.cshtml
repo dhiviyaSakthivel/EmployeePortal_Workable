@@ -91,7 +91,7 @@
             <h4 class="mb-0">Create Employee</h4>
         </div>
         <div class="card-body">
-            <form id="employeeForm" asp-action="Create" method="post" novalidate>
+            <form id="employeeForm" method="post" novalidate>
                 <div id="alertPlaceholder"></div>
                 <div class="row g-3">
                     <div class="col-md-6">
@@ -118,6 +118,7 @@
 
                 <div class="mt-4 text-end">
                     <button type="submit" id="submitbtn" class="btn btn-success px-4">Save</button>
+
                     <a href="/Employee/Index" class="btn btn-secondary">Cancel</a>
                 </div>
             </form>
@@ -136,66 +137,58 @@
       function () { $(this).css('background-color', ''); }
     );
 
-      
-        $('#employeeForm').on('submit', function (e) {
-            let isValid = true;
 
-            // Get values
-            let name = $('#name').val().trim();
-            let dept = $('#department').val().trim();
-            let email = $('#email').val().trim();
-              
-            let age = $('#age').val().trim();
+           $('#employeeForm').on('submit', function (e) {
+        e.preventDefault(); // Prevent default form submission
 
-     
+        let isValid = true;
 
-            // Validate Name
-            if (name === '') {
-                $('#name').addClass('is-invalid');
-                isValid = false;
-            } else {
-                $('#name').removeClass('is-invalid');
-            }
+        // Get form data
+        let name = $('#name').val().trim();
+        let dept = $('#department').val().trim();
+        let email = $('#email').val().trim();
+        let age = $('#age').val().trim();
 
-            // Validate Department
-            if (dept === '') {
-                $('#department').addClass('is-invalid');
-                isValid = false;
-            } else {
-                $('#department').removeClass('is-invalid');
-            }
-            // Validate Age
-            if (email === '') {
-                $('#email').addClass('is-invalid');
-                isValid = false;
-            } else {
-                $('#email').removeClass('is-invalid');
-            }
-         
-            // Validate Age
-            if (age === '') {
-                $('#age').addClass('is-invalid');
-                isValid = false;
-            } else {
-                $('#age').removeClass('is-invalid');
-            }
+        // Validate inputs
+        if (name === '') { $('#name').addClass('is-invalid'); isValid = false; } else { $('#name').removeClass('is-invalid'); }
+        if (dept === '') { $('#department').addClass('is-invalid'); isValid = false; } else { $('#department').removeClass('is-invalid'); }
+        if (email === '') { $('#email').addClass('is-invalid'); isValid = false; } else { $('#email').removeClass('is-invalid'); }
+        if (age === '') { $('#age').addClass('is-invalid'); isValid = false; } else { $('#age').removeClass('is-invalid'); }
 
-            if (!isValid) {
-                e.preventDefault(); // Stop form submission
-            }else {
+        if (!isValid) return;
 
+        // Send data via AJAX
+        $.ajax({
+            url: '/Employee/Create',
+            method: 'POST',
+            data: {
+                Name: name,
+                Department: dept,
+                Email: email,
+                Age: age
+            },
+            success: function (response) {
                 $('#alertPlaceholder').html(`
-        <div class="alert alert-success alert-dismissible fade show" role="alert" id="successAlert">
-            <strong>Success!</strong> Saved successfully.
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    `);
-                // Hide alert after 3 seconds (3000 milliseconds)
-    setTimeout(function () {
-        $('#successAlert').alert('close');
-    }, 10000);
-        }
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Success!</strong> Employee created successfully.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+
+                // Optionally clear the form
+                $('#employeeForm')[0].reset();
+            },
+            error: function () {
+                $('#alertPlaceholder').html(`
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> Something went wrong. Please try again.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `);
+            }
         });
+    });
+
     });
 </script>
 
